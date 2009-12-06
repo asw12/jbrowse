@@ -70,7 +70,6 @@ exit(1);
 }
 
 my @refSeqs = @{JsonGenerator::readJSON("$outdir/refSeqs.js", [], 1)};
-
 die "run prepare-refseqs.pl first to supply information about your reference sequences" if $#refSeqs < 0;
 
 #default label-extracting function, for GFF
@@ -173,24 +172,24 @@ foreach my $seqInfo (@refSeqs) {
     print $seqName . "\t" . $jsonGen->featureCount . "\n";
 
     $jsonGen->generateTrack("$trackDir/$seqName/$trackLabel/", 5000);
+    
+    JsonGenerator::modifyJSFile("$outdir/trackInfo.js", "trackInfo",
+        sub {
+            my $trackList = shift;
+            my $i;
+            for ($i = 0; $i <= $#{$trackList}; $i++) {
+                last if ($trackList->[$i]->{'label'} eq $trackLabel);
+            }
+            $trackList->[$i] =
+            {
+                'label' => $trackLabel,
+                'key' => $style{"key"},
+                'url' => "$trackDir/{refseq}/$trackLabel/trackData.json",
+                'type' => "FeatureTrack",
+            };
+            return $trackList;
+        });
 }
-
-JsonGenerator::modifyJSFile("$outdir/trackInfo.js", "trackInfo",
-    sub {
-        my $trackList = shift;
-        my $i;
-        for ($i = 0; $i <= $#{$trackList}; $i++) {
-            last if ($trackList->[$i]->{'label'} eq $trackLabel);
-        }
-        $trackList->[$i] =
-        {
-            'label' => $trackLabel,
-            'key' => $style{"key"},
-            'url' => "$trackDir/{refseq}/$trackLabel/trackData.json",
-            'type' => "FeatureTrack",
-        };
-        return $trackList;
-    });
 
 =head1 AUTHOR
 
