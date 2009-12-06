@@ -43,6 +43,9 @@ GetOptions("gff=s" => \$gff,
            "type=s@" => \$types);
 my $trackDir = "$outdir/tracks";
 
+my @refSeqs = @{JsonGenerator::readJSON("$outdir/refSeqs.js", [], 1)};
+die "run prepare-refseqs.pl first to supply information about your reference sequences" if $#refSeqs < 0;
+
 if (!(defined($gff) || defined($gff2) || defined($bed)) || !defined($trackLabel)) {
     print "The --tracklabel parameter is required\n"
         unless defined($trackLabel);
@@ -68,9 +71,6 @@ USAGE: $0 [--gff <gff3 file> | --gff2 <gff2 file> | --bed <bed file>] [--out <ou
 USAGE
 exit(1);
 }
-
-my @refSeqs = @{JsonGenerator::readJSON("$outdir/refSeqs.js", [], 1)};
-die "run prepare-refseqs.pl first to supply information about your reference sequences" if $#refSeqs < 0;
 
 #default label-extracting function, for GFF
 my $labelSub = sub {
