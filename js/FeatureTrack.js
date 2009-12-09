@@ -343,11 +343,19 @@ FeatureTrack.prototype.fillFeatures = function(block,
         if (curTrack.urlTemplate) {
             var href = curTrack.urlTemplate.replace(/\{([^}]+)\}/g,
                 function(match, group) {
-                    if(feature[curTrack.fields[group]] != undefined)
-                        return feature[curTrack.fields[group]];
-                    else
+                        for(var key in curTrack.fields)
+                        {
+                            if(key.match(group, "g"))
+                            {
+                                // alert(key + "  " + feature[curTrack.fields[key]]);
+                                if(feature[curTrack.fields[key]] != undefined)
+                                {
+                                    return feature[curTrack.fields[key]];
+                                }
+                            }
+                        }
                         urlValid = false;
-                    return 0;
+                        return 0;
                 });
             if(urlValid)
             {
